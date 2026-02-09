@@ -1,0 +1,11 @@
+project:
+  type: website
+  resources:
+    - waffle-time/dist/**
+
+website:
+  navbar: false
+
+format:
+  html:
+    theme: cosmo

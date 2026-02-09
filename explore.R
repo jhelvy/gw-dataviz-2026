@@ -43,7 +43,8 @@ data <- read_excel(
     n = ifelse(is.na(n), 0, n),
     demos = fct_other(demographics, keep = c('Undergraduate', 'Graduate')),
     date = ymd(date)
-  )
+  ) %>%
+  filter(date < ymd('2025-10-01'))
 
 data_type <- data %>%
   group_by(type) %>%
@@ -131,7 +132,7 @@ data_type_demo %>%
   panel_border()
 
 ggsave(
-  'waffle.png',
+  here('figs', 'waffle.png'),
   width = 15,
   height = 3
 )
@@ -173,7 +174,18 @@ data %>%
   )
 
 ggsave(
-  'bar_time.png',
+  here('figs', 'bar_time.png'),
   width = 15,
   height = 5
 )
+
+# Export summary data for React apps ----
+
+data %>%
+  mutate(
+    month = floor_date(date, 'month'),
+    type = str_to_title(str_replace_all(type, '_', ' '))
+  ) %>%
+  group_by(month, type) %>%
+  summarise(n = sum(n), .groups = 'drop') %>%
+  write_csv(here('waffle-time', 'public', 'seasonal.csv'))
